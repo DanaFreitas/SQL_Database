@@ -1,0 +1,64 @@
+
+
+Q1 Which done products sold for more than $15,000
+
+SELECT DONE_NAME, AMOUNT_SOLD_FOR FROM DONE_PRODUCTS
+WHERE AMOUNT_SOLD_FOR > 15000;
+
+Q2 Which distributors are not from Chicago?
+
+SELECT DIS_NAME, DIS_HQ FROM DISTRIBUTOR
+WHERE DIS_HQ != 'CHICAGO';
+
+Q3 What are the start dates of the supplier compared to the purchasers?
+
+SELECT s.Sup_start_date, p.Pur_start_date
+FROM Supplier s JOIN Make_products m USING (Sup_id)
+JOIN Done_products d USING (Done_id)
+JOIN Product_buy pr USING (Done_id)
+JOIN Purchaser p USING (Pur_id);
+
+Q4 There are companies that have purchased goods and use distributors. What are the names of the distributors whose purhcasing partners are based in either Ohio or Illinois?
+
+SELECT d.Dis_name
+FROM purchaser p JOIN distributor d 
+USING (Dis_id) 
+WHERE Pur_hq_state = 'OH'
+UNION
+SELECT d.Dis_name
+FROM purchaser p JOIN distributor d 
+USING (Dis_id) 
+WHERE Pur_hq_state = 'IL';
+
+Q5 What are the starting years and first name of all of the contractors?
+SELECT SUBSTR(CON_START,8,11), CON_Fname
+FROM CONTRACTOR;
+
+Q6 What are the  full names (in one column) and  wages of the contractors if they are rounded on the left side of he decimal?
+SELECT CON_FNAME || ' ' || CON_LNAME AS "Full Name", ROUND(CON_WAGE,-1)
+FROM contractor;
+
+Q7 Assuming they all work 8 hours in one day, what is the total amount of money contractors will make in 1 day THAT STARTED BEFORE JANUARY 1ST, 2016?
+SELECT SUM(CON_WAGE * 8) AS "TOTAL WAGES"
+FROM CONTRACTOR
+WHERE CON_START < '01-JAN-2016';
+
+Q8 What is the average amount an item or items was sold for by date, where the average amount per date is greater than $20,000?
+
+SELECT EXPORT_DATE, AVG(AMOUNT_SOLD_FOR) "Maximum amount"
+FROM DONE_PRODUCTS
+GROUP BY EXPORT_DATE
+HAVING AVG(AMOUNT_SOLD_FOR) > 20000;
+
+Q9 Which distributors started working with the company before the last supplier began working with the company?
+
+SELECT DIS_NAME, DIS_START_DATE
+FROM DISTRIBUTOR
+WHERE DIS_START_DATE < (SELECT MAX(SUP_START_DATE) FROM SUPPLIER);
+
+Q10 Who are the contractors that make less than the contractor who makes the least who started after December 31, 2013
+
+
+SELECT CON_FNAME || ' ' || CON_LNAME AS "Full Name", CON_WAGE
+from CONTRACTOR
+WHERE CON_START >ANY (SELECT CON_START FROM CONTRACTOR WHERE CON_START > '30-DEC-2013');
